@@ -1,54 +1,40 @@
 M = {}
-local job = nil
-local Job = require('plenary.job')
-local function getCommand(file)
-	local cmd = string.format("tail -n0 -F -- %s", file)
-	-- return string.format("sh -c '%s'", cmd)
-	if vim.fn.has("win32") or vim.fn.has("win64") then
-		return cmd
+local _opts = require("autoread.state").opts.builtin
+local state = require("autoread.state")
+local path = require("autoread.path")
+local job = require("autoread.job")
+
+
+M.autoReadStart = function(opts)
+	opts = vim.tbl_deep_extend("force", _opts, opts or {})
+	local file_name = path.getFileName(opts)
+	local started = "started"..file_name
+	if not state.get(started) then
+		local status = job.start(file_name, opts.job)
+		state.set(started, not status)
 	else
-		return string.format("sh -c '%s'", cmd)
+		print(string.format(
+		"Job already started for %s, run require('autoread.builtin').autoReadStop() first",
+		file_name
+		))
+		return
 	end
 end
 
-local handleStdOut = function(j, return_val)
-	print("j", j)
-	print("return_val", return_val)
-	local bufnr = 12
-	vim.schedule(function ()
-		vim.cmd[[checktime]]
-		-- vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {return_val})
-	end)
-	-- print(j:result())
-end
-
-M.autoReadStart = function(opts)
-	local file_name = vim.fn.expand("%")
-	file_name = vim.fn.fnamemodify(file_name, ':p')
-	local buff = vim.api.nvim_get_current_buf()
-	-- vim.cmd[[echo bufnr('%')]]
-	-- local agroup = 'vim-autoread-'..buff
-	-- P("agroup : ", agroup )
-	-- local agroup_cmd = 'augroup '..agroup
-	-- P("agroup_cmd : ", agroup_cmd )
-	-- return
-	local command = getCommand(file_name)
-	P("command : ", command )
-	job = Job:new({
-		-- command = command,
-		-- command = "tail",
-		command = "sh",
-		-- args = {'-f', '---disable-inotify', 'lua/autoread/builtin.lua'},
-		args = {'-c', 'tail -n0 -F -- /home/josiah/.config/plover/clippy_2.org'},
-		on_stdout = handleStdOut
-	})
-	job:start()
-end
-
 M.autoReadStop = function(opts)
-	job:shutdown()
+	opts = vim.tbl_deep_extend("force", _opts, opts or {})
+	local file_name = path.getFileName(opts)
+	local started = "started"..file_name
+	if state.get(started) then
+		local status = job.stop(file_name, opts.job)
+		state.set(started, status)
+	else
+		print(string.format(
+		"Job not started yet for %s, run require('autoread.builtin').autoReadStart() first",
+		file_name
+		))
+		return
+	end
 end
 
-vim.keymap.set("n", "<leader>js", function() M.autoReadStart() end)
-vim.keymap.set("n", "<leader>je", function() M.autoReadStop() end)
 return M

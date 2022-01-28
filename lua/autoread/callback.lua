@@ -1,24 +1,24 @@
 M = {}
 
----on_start function       : Run when starting job
----on_stdout function      : (error: string, data: string, self? Job)
----on_exit function        : (self, code: number, signal: number)
-
 M.onStdout = function(error, data, self, bufnr)
-	-- local bufnr = 12
 	vim.schedule(function ()
 		vim.cmd("checktime ", bufnr)
-		-- vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {return_val})
+		local windows = vim.fn.win_findbuf(bufnr)
+		for _, window in ipairs(windows) do
+			vim.api.nvim_win_set_cursor(window, {vim.fn.line('$', window), 0})
+		end
+		-- vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {data})
+		-- print(error:result())
 	end)
-	-- print(j:result())
 end
 
 M.onExit = function (self, code, signal)
 	print("exiting")
 end
 
-M.onStart = function () 
+M.onStart = function ()
 	print('starting')
 end
 
 return M
+

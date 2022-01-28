@@ -1,6 +1,7 @@
 M = {}
 
--- local global = require("autoread.global")
+local debug = require("autoread.debug")
+local fold = require("autoread.fold")
 
 M.onStdout = function(error, data, self, bufnr)
 	vim.schedule(function ()
@@ -14,14 +15,14 @@ M.onStdout = function(error, data, self, bufnr)
 	end)
 end
 
-M.onExit = function (self, code, signal, bufnr)
-	print("exiting")
-	-- global.log("exiting")
+M.onStart = function (bufnr, file_name)
+	debug.log('starting job for '..bufnr..', '..file_name)
+	fold.setMethod(bufnr, "indent") -- remove those pesky folds!
 end
 
-M.onStart = function (bufnr)
-	print('starting')
-	-- global.log('starting')
+M.onExit = function (self, code, signal, bufnr, file_name)
+	debug.log('exiting job for '..bufnr..', '..file_name)
+	fold.restoreMethod(bufnr)
 end
 
 return M

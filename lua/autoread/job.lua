@@ -1,5 +1,5 @@
 M = {}
--- local global = require("autoread.global")
+local debug = require("autoread.debug")
 local state = require("autoread.state")
 local buffer = RELOAD("autoread.buffer")
 local callback = RELOAD("autoread.callback")
@@ -26,18 +26,18 @@ M.start = function (file_name, opts)
 				callback.onStdout(error, data, self, bufnr)
 			end,
 			on_start = function()
-				callback.onStart(bufnr)
+				callback.onStart(bufnr, file_name)
 			end,
 			on_exit = function (self, code, signal)
-				callback.onExit(bufnr)
+				callback.onExit(self, code, signal, bufnr, file_name)
 			end,
 		})
 		job:start()
 		state.set(jobID, job)
 		return false
 	else
-		print(string.format("buf with file_name '%s' does not exist", file_name))
-		-- global.log(string.format("buf with file_name '%s' does not exist", file_name))
+		-- print(string.format("buf with file_name '%s' does not exist", file_name))
+		debug.log(string.format("buf with file_name '%s' does not exist", file_name))
 		return true
 	end
 end
@@ -49,8 +49,8 @@ M.stop = function (file_name, opts)
 		job:shutdown()
 		return false
 	else
-		print(string.format("Error: Job with file_name '%s' does not exist", file_name))
-		-- global.log(string.format("Error: Job with file_name '%s' does not exist", file_name))
+		-- print(string.format("Error: Job with file_name '%s' does not exist", file_name))
+		debug.log(string.format("Error: Job with file_name '%s' does not exist", file_name))
 		return true
 	end
 end

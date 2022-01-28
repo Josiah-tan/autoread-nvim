@@ -17,7 +17,7 @@ end
 
 local array2Dict = function (array, sep)
 	local t = {}
-	P(array)
+	-- P(array)
 	for _, s in ipairs(array) do
 		local words = {}
 		for word in string.gmatch(s, '([^,]+)') do
@@ -35,7 +35,7 @@ end
 M.splitStr2 = function (inputstr, sep1, sep2)
 	local array = splitStr(inputstr, sep1)
 	local dict = array2Dict(array, sep2)
-	P("dict : ", dict )
+	-- P("dict : ", dict )
 	return dict
 	-- for i, s in ipairs(inputstr) do
 	-- 	inputstr[i] = array2Dict(s, sep2)

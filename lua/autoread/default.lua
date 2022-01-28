@@ -2,7 +2,7 @@ M = {}
 
 local getJob = function ()
 	local job = nil
-	if vim.fn.has("win32") or vim.fn.has("win64") then
+	if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
 		job = {
 			command = 'tail',
 			args = {'-n0', '-F', '--', "%s"}
@@ -13,6 +13,7 @@ local getJob = function ()
 			args = {'-c', 'tail -n0 -F -- %s'},
 		}
 	end
+	-- P("job: ", job)
 	return job
 end
 
@@ -31,6 +32,7 @@ end
 M.opts = {
 	builtin = M.builtin,
 	disable_default_mappings = true,
+	verbose = false
 }
 
 return M

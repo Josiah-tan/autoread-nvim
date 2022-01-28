@@ -9,7 +9,7 @@ local getNames = function ()
 	endfor
 	]], 1)
 	paths = algo.splitStr2(paths, '\n', ',')
-	P("paths : ", paths )
+	-- P("paths : ", paths )
 	-- local paths = vim.api.nvim_exec([[
 	-- for buf in getbufinfo({"bufloaded":1})
 	-- 	echo buf.name

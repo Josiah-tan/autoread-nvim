@@ -1,5 +1,7 @@
 M = {}
 
+-- local global = require("autoread.global")
+
 M.onStdout = function(error, data, self, bufnr)
 	vim.schedule(function ()
 		vim.cmd("checktime ", bufnr)
@@ -12,12 +14,14 @@ M.onStdout = function(error, data, self, bufnr)
 	end)
 end
 
-M.onExit = function (self, code, signal)
+M.onExit = function (self, code, signal, bufnr)
 	print("exiting")
+	-- global.log("exiting")
 end
 
-M.onStart = function ()
+M.onStart = function (bufnr)
 	print('starting')
+	-- global.log('starting')
 end
 
 return M
